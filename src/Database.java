@@ -1,11 +1,11 @@
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Database {
@@ -14,26 +14,49 @@ public class Database {
 	private String username;
 	private String password;
 	
-	public void generate(String username, String password) {
+	public boolean checkSchema(String name, String username, String password, String address, String port) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://127.0.0.1:3306/";
+			String url = "jdbc:mysql://" + address + ":" + port + "/";
+			Connection connection = DriverManager.getConnection(url, username, password);
+			DatabaseMetaData metaData = connection.getMetaData();
+			
+			ResultSet schemas = metaData.getCatalogs();
+			while(schemas.next()) {
+				String schemaName = schemas.getString(1);
+				if (name.equals(schemaName)) {
+					return true;
+				}
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public void generate(String databaseName, String username, String password, String address, String port) {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String url = "jdbc:mysql://" + address + ":" + port + "/";
 			Connection connection = DriverManager.getConnection(url, username, password);
 			Statement statement = connection.createStatement();
-			statement.executeUpdate("CREATE SCHEMA inventory;");
-			statement.executeUpdate("CREATE TABLE `inventory`.`badges` (`id` INT NOT NULL, `name` VARCHAR(45) NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`sootbadges` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`stickers` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`sootstickers` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`shirts` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `size` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`hoodies` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `size` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
-			statement.executeUpdate("CREATE TABLE `inventory`.`packs` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
-			Object[][] artworks = {{"Mona Lisa", "A4", 8}, {"Starry Night", "A3", 9}, {"The Scream", "A2", 7}, {"Girl with a Pearl Earring", "A5", 10}, {"The Persistence of Memory", "A4", 6}, {"The Last Supper", "A3", 9}, {"The Kiss", "A2", 7}, {"American Gothic", "A6", 5}, {"Guernica", "A3", 10}, {"The Birth of Venus", "A4", 8}, {"Las Meninas", "A5", 6}, {"The Arnolfini Portrait", "A6", 7}, {"The Night Watch", "A3", 8}, {"The Garden of Earthly Delights", "A2", 9}, {"The Hay Wain", "A5", 7}, {"Liberty Leading the People", "A4", 9}, {"The Swing", "A6", 6}, {"The School of Athens", "A3", 10}, {"Whistler's Mother", "A5", 8}, {"The Son of Man", "A4", 7}};
+			statement.executeUpdate("CREATE SCHEMA " + databaseName + ";");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`badges` (`id` INT NOT NULL, `name` VARCHAR(45) NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`sootbadges` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`stickers` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`sootstickers` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`shirts` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `size` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`hoodies` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `size` VARCHAR(45) NOT NULL, `amount` VARCHAR(45) NOT NULL, PRIMARY KEY (`id`));");
+			statement.executeUpdate("CREATE TABLE `" + databaseName + "`.`packs` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
+			Object[][] artworks = {{"Mona Lisa", "A4", 8}, {"Starry Night", "A3", 9}, {"The Scream", "A2", 7}, {"Girl with a Pearl Earring", "A5", 10}, {"The Persistence of Memory", "A4", 6}, {"The Last Supper", "A3", 9}, {"The Kiss", "A2", 7}, {"American Gothic", "A6", 5}, {"Guernica", "A3", 10}, {"The Birth of Venus", "A4", 8}, {"Las Meninas", "A5", 6}, {"The Arnolfini Portrait", "A6", 7}, {"The Night Watch", "A3", 8}, {"The Garden of Earthly Delights", "A2", 9}, {"The Hay Wain", "A5", 7}, {"Liberty Leading the People", "A4", 9}, {"The Swing", "A6", 6}, {"The School of Athens", "A3", 10}, {"The Son of Man", "A4", 7}};
 			statement.executeUpdate("CREATE TABLE `inventory`.`prints` (`id` INT NOT NULL, `name` VARCHAR(45) NOT NULL, `size` VARCHAR(45) NOT NULL, `amount` INT NOT NULL, PRIMARY KEY (`id`));");
 			for (Object[] entry : artworks) {
 				insert("prints", entry);
 			}
-			Object[][] artworks2 = {{"Mona Lisa", 8}, {"Starry Night", 9}, {"The Scream", 7}, {"Girl with a Pearl Earring", 10}, {"The Persistence of Memory", 6}, {"The Last Supper", 9}, {"The Kiss", 7}, {"American Gothic", 5}, {"Guernica", 10}, {"The Birth of Venus", 8}, {"Las Meninas", 6}, {"The Arnolfini Portrait", 7}, {"The Night Watch", 8}, {"The Garden of Earthly Delights", 9}, {"The Hay Wain", 7}, {"Liberty Leading the People", 9}, {"The Swing", 6}, {"The School of Athens", 10}, {"Whistler's Mother", 8}, {"The Son of Man", 7}};
+			Object[][] artworks2 = {{"Mona Lisa", 8}, {"Starry Night", 9}, {"The Scream", 7}, {"Girl with a Pearl Earring", 10}, {"The Persistence of Memory", 6}, {"The Last Supper", 9}, {"The Kiss", 7}, {"American Gothic", 5}, {"Guernica", 10}, {"The Birth of Venus", 8}, {"Las Meninas", 6}, {"The Arnolfini Portrait", 7}, {"The Night Watch", 8}, {"The Garden of Earthly Delights", 9}, {"The Hay Wain", 7}, {"Liberty Leading the People", 9}, {"The Swing", 6}, {"The School of Athens", 10}, {"The Son of Man", 7}};
 			for (Object[] entry : artworks2) {
 				insert("badges", entry);
 				insert("sootbadges", entry);
@@ -41,7 +64,7 @@ public class Database {
 				insert("sootstickers", entry);
 				insert("packs", entry);
 			}
-			Object[][] artworks3 = {{"Mona Lisa", "M", 8}, {"Starry Night", "L", 9}, {"The Scream", "S", 7}, {"Girl with a Pearl Earring", "XL", 10}, {"The Persistence of Memory", "M", 6}, {"The Last Supper", "L", 9}, {"The Kiss", "S", 7}, {"American Gothic", "XS", 5}, {"Guernica", "L", 10}, {"The Birth of Venus", "M", 8}, {"Las Meninas", "S", 6}, {"The Arnolfini Portrait", "XS", 7}, {"The Night Watch", "L", 8}, {"The Garden of Earthly Delights", "S", 9}, {"The Hay Wain", "XL", 7}, {"Liberty Leading the People", "M", 9}, {"The Swing", "XS", 6}, {"The School of Athens", "L", 10}, {"Whistler's Mother", "S", 8}, {"The Son of Man", "M", 7}};
+			Object[][] artworks3 = {{"Mona Lisa", "M", 8}, {"Starry Night", "L", 9}, {"The Scream", "S", 7}, {"Girl with a Pearl Earring", "XL", 10}, {"The Persistence of Memory", "M", 6}, {"The Last Supper", "L", 9}, {"The Kiss", "S", 7}, {"American Gothic", "XS", 5}, {"Guernica", "L", 10}, {"The Birth of Venus", "M", 8}, {"Las Meninas", "S", 6}, {"The Arnolfini Portrait", "XS", 7}, {"The Night Watch", "L", 8}, {"The Garden of Earthly Delights", "S", 9}, {"The Hay Wain", "XL", 7}, {"Liberty Leading the People", "M", 9}, {"The Swing", "XS", 6}, {"The School of Athens", "L", 10}, {"The Son of Man", "M", 7}};
 			for (Object[] entry : artworks3) {
 				insert("shirts", entry);
 				insert("hoodies", entry);
@@ -54,20 +77,19 @@ public class Database {
 		}
 	}
 	
-	public boolean tryLogin(String databaseName, String username, String password) {
+	public boolean tryLogin(String username, String password, String address, String port) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://127.0.0.1:3306/" + databaseName;
+			String url = "jdbc:mysql://" + address + ":" + port + "/";
 			DriverManager.getConnection(url, username, password);
 			
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			return false;
 		}
-		return true;
+		return false;
 	}
 	
 	public void insert(String tableName, Object[] data) {
