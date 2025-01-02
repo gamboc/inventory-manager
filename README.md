@@ -17,12 +17,11 @@ Type in the user credentials and click the login button. If a schema with the na
 
 ## Inventory manager
 
-![Screenshot from 2024-12-18 18-56-55](https://github.com/user-attachments/assets/bceb32b1-8ee6-4053-b428-703edd989889)
+![Screenshot from 2025-01-03 00-22-51](https://github.com/user-attachments/assets/561e8942-8134-4b1c-8541-e83c0024474d)
 Once the user has loggen in, they can manage their inventory.
 
 # TO DO
 1. Edit the apperance the login screen
 2. Edit the appearance of the table
 3. Make the window resizable
-4. Change the black panel on the right with a panel that handles data insertion
-5. Refractor the code to make it more readable
+4. Refractor the code to make it more readable
