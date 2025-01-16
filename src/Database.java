@@ -13,6 +13,8 @@ public class Database {
 	private String databaseName;
 	private String username;
 	private String password;
+	private String address;
+	private String port;
 	
 	public boolean checkSchema(String name, String username, String password, String address, String port) {
 		try {
@@ -260,6 +262,6 @@ public class Database {
 		return list;
 	}
 	
-	public Database() {
+	public Database(String databaseName, String username, String password, String address, String port) {
 	}
 }

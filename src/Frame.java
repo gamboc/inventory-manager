@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,6 +13,7 @@ public class Frame extends JFrame {
 	private JPanel centerPanel;
 	private Database database;
 	private static String currentItem;
+	private Menu menu;
 	
 	public static void changeCurrentItem(String newItem) {
 		currentItem = newItem;
@@ -27,16 +27,20 @@ public class Frame extends JFrame {
 		return this.database;
 	}
 	
-	private void sucessfulLogin() {
+	public Menu getMenu() {
+		return this.menu;
+	}
+	
+	public void update(String tableName) {
 		this.getContentPane().removeAll();
 		this.setLayout(new BorderLayout());
 		
 		this.centerPanel = new JPanel();
-		centerPanel.setLayout(new BorderLayout());
+		this.centerPanel.setLayout(new BorderLayout());
 		this.add(centerPanel, BorderLayout.EAST);
 		
-		MenuBar menuBar = new MenuBar(this);
-		this.add(menuBar, BorderLayout.WEST);
+		this.menu = new Menu(this, tableName);
+		this.add(this.menu, BorderLayout.WEST);
 		
 		this.revalidate();
 		this.repaint();
@@ -54,7 +58,7 @@ public class Frame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setMinimumSize(new Dimension(1400, 900));
 		this.setLocationRelativeTo(null);
-		this.setResizable(true);
+		this.setResizable(false);
 		this.setLayout(null);
 		this.getContentPane().setBackground(Color.black);
 		
@@ -110,7 +114,7 @@ public class Frame extends JFrame {
 						database.generate(databaseNameField.getText(), usernameField.getText(), passwordField.getText(), addressField.getText(), portField.getText());
 					}
 					
-					sucessfulLogin();
+					update("prints");
 				}
 			}
 		});

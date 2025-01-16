@@ -380,6 +380,7 @@ class SidePanel extends JPanel {
 				}
 				
 				database.insert(tableName, entries);
+				frame.update(tableName);
 			}
 		});
 		this.add(insertButton);
